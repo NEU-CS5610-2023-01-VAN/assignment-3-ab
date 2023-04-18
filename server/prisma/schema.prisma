@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Question {
+  id          Int  @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  title       String   @db.VarChar(255)
+  body        String   @db.VarChar(1000)
+  answered    Boolean  @default(false)
+  author      User     @relation(fields: [authorId], references: [id])
+  authorId    Int
+  answers     Answer[]
+  tag         Tag      @relation(fields: [tagID], references: [id])
+  tagID       Int
+}
+
+model User {
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  auth0Id    String   @unique @default("")
+  name       String?
+  questions  Question[]
+  answers    Answer[]
+}
+
+model Answer {
+    id          Int        @id @default(autoincrement())
+    createdAt   DateTime   @default(now())
+    content     String     @db.VarChar(1000)
+    question    Question   @relation(fields: [questionID], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    questionID  Int
+    author      User       @relation(fields: [userId], references: [id], onUpdate: Cascade, onDelete: Cascade)
+    userId      Int
+}
+
+model Tag {
+    id        Int      @id @default(autoincrement())
+    createdAt DateTime @default(now())
+    name      String
+    questions Question[]
+}
