@@ -11,22 +11,22 @@ datasource db {
 }
 
 model Question {
-  id          Int  @id @default(autoincrement())
-  createdAt   DateTime @default(now())
-  title       String   @db.VarChar(255)
-  body        String   @db.VarChar(1000)
-  answered    Boolean  @default(false)
-  author      User     @relation(fields: [authorId], references: [id])
+  id          Int       @id @default(autoincrement())
+  createdAt   DateTime  @default(now())
+  title       String    @db.VarChar(255)
+  body        String    @db.VarChar(1000)
+  // answered    Boolean   @default(false)
+  author      User      @relation(fields: [authorId], references: [id], onUpdate: Cascade, onDelete: Cascade)
   authorId    Int
   answers     Answer[]
-  tag         Tag      @relation(fields: [tagID], references: [id])
+  tag         Tag       @relation(fields: [tagID], references: [id])
   tagID       Int
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique
-  auth0Id    String   @unique @default("")
+  id         Int        @id @default(autoincrement())
+  email      String     @unique
+  // auth0Id    String     @unique @default("")
   name       String?
   questions  Question[]
   answers    Answer[]
@@ -43,8 +43,8 @@ model Answer {
 }
 
 model Tag {
-    id        Int      @id @default(autoincrement())
-    createdAt DateTime @default(now())
-    name      String
+    id        Int         @id @default(autoincrement())
+    createdAt DateTime    @default(now())
+    name      String      @unique
     questions Question[]
 }
