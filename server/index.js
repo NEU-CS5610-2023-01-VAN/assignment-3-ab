@@ -168,7 +168,9 @@ app.get("/user/:id", async (req, res) => {
 
 // GET list of all questions
 app.get("/questions", async (req, res) => {
-  const reviews = await prisma.question.findMany();
+  const reviews = await prisma.question.findMany({
+    include: { tag: true, answers: true },
+  });
   res.status(200).json(reviews);
 });
 
