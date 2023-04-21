@@ -123,6 +123,7 @@ export default function Navbar() {
             >
               {navigation.map((item) => (
                 <NavLink
+                  key={item.name}
                   to={item.to}
                   className={classNames(
                     item.current
