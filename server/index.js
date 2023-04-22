@@ -6,11 +6,11 @@ import morgan from "morgan";
 import cors from "cors";
 import { auth } from "express-oauth2-jwt-bearer";
 
-// const requireAuth = auth({
-//   audience: process.env.AUTH0_AUDIENCE,
-//   issuerBaseURL: process.env.AUTH0_ISSUER,
-//   tokenSigningAlg: 'RS256'
-// });
+const requireAuth = auth({
+  audience: process.env.AUTH0_AUDIENCE,
+  issuerBaseURL: process.env.AUTH0_ISSUER,
+  tokenSigningAlg: "RS256",
+});
 
 const app = express();
 
@@ -27,119 +27,85 @@ app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
-// // GET user-specific questions
-// app.get("/questions", requireAuth, async (req, res) => {
-//   const auth0Id = req.auth.payload.sub;
-
-//   const user = await prisma.user.findUnique({
-//     where: {
-//       auth0Id,
-//     },
-//   });
-
-//   const questions = await prisma.question.findMany({
-//     where: {
-//       authorId: user.id,
-//     },
-//   });
-
-//   res.json(questions);
-// });
-
 // *** POST *** //
 
-// POST - creates a user without Auth ---------------------------------------------------------------------------------
-app.post("/user", async (req, res) => {
-  const { email, name } = req.body;
+// // POST - creates a user without Auth ---------------------------------------------------------------------------------
+// app.post("/user", async (req, res) => {
+//   const { email, name } = req.body;
 
-  if (!email) {
-    res.status(400).send("Email is required");
+//   if (!email) {
+//     res.status(400).send("Email is required");
+//   } else {
+//     const newUser = await prisma.user.create({
+//       data: {
+//         email,
+//         name,
+//       },
+//     });
+
+//     res.status(201).json(newUser);
+//   }
+// });
+
+// verify user status, if not registered in our database we will create it
+app.post("/verify-user", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+  const email = req.auth.payload[`${process.env.AUTH0_AUDIENCE}/email`];
+  const name = req.auth.payload[`${process.env.AUTH0_AUDIENCE}/name`];
+
+  const user = await prisma.user.findUnique({
+    where: {
+      auth0Id,
+    },
+  });
+
+  if (user) {
+    res.json(user);
   } else {
     const newUser = await prisma.user.create({
       data: {
         email,
+        auth0Id,
         name,
       },
     });
 
-    res.status(201).json(newUser);
+    res.json(newUser);
   }
 });
 
-// POST - creates a question without Auth ---------------------------------------------------------------------------------
-app.post("/question", async (req, res) => {
-  const { title, body, tagID, userID } = req.body;
+// // POST - creates a question without Auth ---------------------------------------------------------------------------------
+// app.post("/question", async (req, res) => {
+//   const { title, body, tagID, userID } = req.body;
 
-  if (!title || !body || !tagID | !userID) {
-    res.status(400).send("Title, body and tagID, userID are required");
-  } else {
-    const newQuestion = await prisma.question.create({
-      data: {
-        title,
-        body,
-        author: { connect: { id: parseInt(userID) } },
-        tag: { connect: { id: parseInt(tagID) } },
-      },
-      include: { answers: true, tag: true, author: true },
-    });
-
-    res.status(201).json(newQuestion);
-  }
-});
-
-// POST - creates an answer without Auth ---------------------------------------------------------------------------------
-app.post("/answer", async (req, res) => {
-  const { content, questionID, userID } = req.body;
-
-  if (!content || !questionID | !userID) {
-    res.status(400).send("Content and questionID are required");
-  } else {
-    const newAnswer = await prisma.answer.create({
-      data: {
-        content,
-        author: { connect: { id: parseInt(userID) } },
-        question: { connect: { id: parseInt(questionID) } },
-      },
-    });
-
-    res.status(201).json(newAnswer);
-  }
-});
-
-// // POST - creates a question
-// app.post("/question", requireAuth, async (req, res) => {
-//   const auth0Id = req.auth.payload.sub;
-
-//   const { title, body, tagID } = req.body;
-
-//   if (!title || !body || !tagID) {
-//     res.status(400).send("Title, body and tagID are required");
+//   if (!title || !body || !tagID | !userID) {
+//     res.status(400).send("Title, body and tagID, userID are required");
 //   } else {
 //     const newQuestion = await prisma.question.create({
 //       data: {
 //         title,
-//         author: { connect: { auth0Id } },
+//         body,
+//         author: { connect: { id: parseInt(userID) } },
 //         tag: { connect: { id: parseInt(tagID) } },
 //       },
+//       include: { answers: true, tag: true, author: true },
 //     });
 
 //     res.status(201).json(newQuestion);
 //   }
 // });
 
-// // POST - creates an answer
-// app.post("/answer", requireAuth, async (req, res) => {
-//   const auth0Id = req.auth.payload.sub;
+// // POST - creates an answer without Auth ---------------------------------------------------------------------------------
+// app.post("/answer", async (req, res) => {
+//   const { content, questionID, userID } = req.body;
 
-//   const { content, questionID } = req.body;
-
-//   if (!content || !questionID) {
+//   if (!content || !questionID | !userID) {
 //     res.status(400).send("Content and questionID are required");
 //   } else {
 //     const newAnswer = await prisma.answer.create({
 //       data: {
 //         content,
-//         author: { connect: { auth0Id } },
+//         author: { connect: { id: parseInt(userID) } },
 //         question: { connect: { id: parseInt(questionID) } },
 //       },
 //     });
@@ -148,23 +114,92 @@ app.post("/answer", async (req, res) => {
 //   }
 // });
 
+// POST - creates a question
+app.post("/question", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+
+  const { title, body, tagID } = req.body;
+
+  if (!title || !body || !tagID) {
+    res.status(400).send("Title, body and tagID are required");
+  } else {
+    const newQuestion = await prisma.question.create({
+      data: {
+        title,
+        author: { connect: { auth0Id } },
+        tag: { connect: { id: parseInt(tagID) } },
+      },
+    });
+
+    res.status(201).json(newQuestion);
+  }
+});
+
+// POST - creates an answer
+app.post("/answer", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+
+  const { content, questionID } = req.body;
+
+  if (!content || !questionID) {
+    res.status(400).send("Content and questionID are required");
+  } else {
+    const newAnswer = await prisma.answer.create({
+      data: {
+        content,
+        author: { connect: { auth0Id } },
+        question: { connect: { id: parseInt(questionID) } },
+      },
+    });
+
+    res.status(201).json(newAnswer);
+  }
+});
+
 // *** GET *** //
 
-// GET - a user by id without Auth ---------------------------------------------------------------------------------
-app.get("/user/:id", async (req, res) => {
-  const id = req.params.id;
-  if (!id) {
-    res.status(400).send("User ID is required");
-  }
+// // GET - a user by id without Auth ---------------------------------------------------------------------------------
+// app.get("/user/:id", async (req, res) => {
+//   const id = req.params.id;
+//   if (!id) {
+//     res.status(400).send("User ID is required");
+//   }
+//   const user = await prisma.user.findUnique({
+//     where: {
+//       id: parseInt(id),
+//     },
+//     include: { questions: true, answers: true },
+//   });
+
+//   res.status(201).json(user);
+// });
+
+// GET Profile information of authenticated user
+app.get("/profile", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+
   const user = await prisma.user.findUnique({
     where: {
-      id: parseInt(id),
+      auth0Id,
     },
-    include: { questions: true, answers: true },
+    include: { questions: { include: { answers } } },
   });
 
-  res.status(201).json(user);
+  res.json(user);
 });
+
+// // get logged in user posts/questions of authenticated user
+// app.get("/me", requireAuth, async (req, res) => {
+//   const auth0Id = req.auth.payload.sub;
+
+//   const user = await prisma.user.findUnique({
+//     where: {
+//       auth0Id,
+//     },
+//   });
+
+//   res.json(user);
+// });
 
 // GET list of all questions
 app.get("/questions", async (req, res) => {
@@ -206,22 +241,36 @@ app.get("/answer/:id", async (req, res) => {
   res.status(201).json(answer);
 });
 
-// GET user-specific questions without Auth ---------------------------------------------------------------------------------
-app.get("/questions/user/:id", async (req, res) => {
-  const userId = req.params.id;
-  if (!userId) {
-    res.status(400).send("User ID is required");
-  }
+// // GET user-specific questions with AUTH
+app.get("/questions", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
 
-  const userQuestions = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: {
-      id: parseInt(userId),
+      auth0Id,
     },
-    include: { questions: true },
+    include: { questions: { include: { answers: true } } },
   });
 
-  res.json(userQuestions);
+  res.json(user);
 });
+
+// // GET user-specific questions without Auth ---------------------------------------------------------------------------------
+// app.get("/questions/user/:id", async (req, res) => {
+//   const userId = req.params.id;
+//   if (!userId) {
+//     res.status(400).send("User ID is required");
+//   }
+
+//   const userQuestions = await prisma.user.findUnique({
+//     where: {
+//       id: parseInt(userId),
+//     },
+//     include: { questions: true },
+//   });
+
+//   res.json(userQuestions);
+// });
 
 // GET list of all questions under a tag
 app.get("/questions/:tag", async (req, res) => {
@@ -243,40 +292,35 @@ app.get("/questions/:tag", async (req, res) => {
   }
 });
 
-// GET user-specific answers - no Auth0 ///// / /   //////  / / / / / / / / / / / / //  / / / / / //  / //  / / / / //  / / /
-app.get("/answers/user/:id", async (req, res) => {
-  const userId = req.params.id;
-  if (!userId) {
-    res.status(400).send("user ID is required");
-  }
-  const userAnswers = await prisma.user.findUnique({
+// // GET user-specific answers - no Auth0 ///// / /   //////  / / / / / / / / / / / / //  / / / / / //  / //  / / / / //  / / /
+// app.get("/answers/user/:id", async (req, res) => {
+//   const userId = req.params.id;
+//   if (!userId) {
+//     res.status(400).send("user ID is required");
+//   }
+//   const userAnswers = await prisma.user.findUnique({
+//     where: {
+//       id: parseInt(userId),
+//     },
+//     include: { answers: true },
+//   });
+
+//   res.json(userAnswers);
+// });
+
+// GET user-specific answers
+app.get("/answers", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
+
+  const user = await prisma.user.findUnique({
     where: {
-      id: parseInt(userId),
+      auth0Id,
     },
-    include: { answers: true },
+    include: { answers: { include: { question: true } } },
   });
 
-  res.json(userAnswers);
+  res.json(user);
 });
-
-// // GET user-specific answers
-// app.get("/answers", requireAuth, async (req, res) => {
-//   const auth0Id = req.auth.payload.sub;
-
-//   const user = await prisma.user.findUnique({
-//     where: {
-//       auth0Id,
-//     },
-//   });
-
-//   const answers = await prisma.answer.findMany({
-//     where: {
-//       authorId: user.id,
-//     },
-//   });
-
-//   res.json(answers);
-// });
 
 // *** PUT *** //
 
@@ -327,7 +371,7 @@ app.delete("/users/:id", async (req, res) => {
 });
 
 // DELETE: delete an existing question
-app.delete("/questions/:id", async (req, res) => {
+app.delete("/questions/:id", requireAuth, async (req, res) => {
   if (!req.params.id) {
     res.status(401).send("Incorrect input values");
   }
@@ -347,7 +391,7 @@ app.delete("/questions/:id", async (req, res) => {
 });
 
 // DELETE: delete an existing answer
-app.delete("/answers/:id", async (req, res) => {
+app.delete("/answers/:id", requireAuth, async (req, res) => {
   if (!req.params.id) {
     res.status(401).send("Incorrect input values");
   }

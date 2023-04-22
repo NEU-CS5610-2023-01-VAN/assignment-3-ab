@@ -26,7 +26,7 @@ model Question {
 model User {
   id         Int        @id @default(autoincrement())
   email      String     @unique
-  // auth0Id    String     @unique @default("")
+  auth0Id    String     @unique @default("")
   name       String?
   questions  Question[]
   answers    Answer[]
