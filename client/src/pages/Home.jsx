@@ -14,7 +14,7 @@ const items = [
 ];
 
 function Home() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   function Example() {
     return (
       <ul role="list" className="space-y-3 mt-5">
@@ -26,7 +26,7 @@ function Home() {
           >
             <div className="border-4 border-gray-400 divide-y divide-gray-100 overflow-hidden rounded-md bg-white shadow-lg hover:bg-gray-100">
               <div className="px-4 py-5 sm:px-6 text-2xl font-bold">
-                {item.title} 
+                {item.title}
                 {/* Content goes here */}
                 {/* We use less vertical padding on card headers on desktop than on body sections */}
               </div>
@@ -57,7 +57,7 @@ function Home() {
       {/* <div className="lg:px-20 md:px-20">
         <Example />
       </div> */}
-        <Feed />
+      <Feed />
       <Footer />
     </div>
   );

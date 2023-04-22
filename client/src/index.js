@@ -3,16 +3,51 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import Home from "./pages/Home";
 import SignIn from "./pages/SignIn";
-import VerifyUser from "./pages/SignIn";
 import UserPosts from "./pages/UserPosts";
-import UserDetail from "./pages/UserDetail";
+import Profile from "./pages/Profile";
+import ProfileSettings from "./pages/ProfileSettings";
 import PostDetails from "./pages/PostDetails";
 import NotFound from "./pages/NotFound";
+import VerifyUser from "./components/VerifyUser";
+import AuthDebugger from "./components/AuthDebugger";
+import { Auth0Provider, useAuth0 } from "@auth0/auth0-react";
+import { AuthTokenProvider } from "./AuthTokenContext";
 
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+const requestedScopes = [
+  "profile",
+  "email",
+  "read:user",
+  "read:question",
+  "read:answer",
+  "read:tag",
+  "edit:user",
+  "edit:question",
+  "edit:answer",
+  "edit:tag",
+  "write:user",
+  "write:question",
+  "write:answer",
+  "write:tag",
+  "delete:user",
+  "delete:question",
+  "delete:answer",
+  "delete:tag",
+];
+
+function RequireAuth({ children }) {
+  const { isAuthenticated, isLoading } = useAuth0();
+
+  if (!isLoading && !isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+}
+
 root.render(
   <React.StrictMode>
     {/* <Auth0Provider
@@ -30,17 +65,34 @@ root.render(
         <Route path="/" element={<Home />} />
         <Route path="/sign-in" element={<SignIn />} />
         <Route path="/verify-user" element={<VerifyUser />} />
-        <Route path="user/:id/posts" element={<UserPosts />} />
-        <Route path="users/:id" element={<UserDetail />} />
         <Route path="posts/:id" element={<PostDetails />} />
+
         {/* <Route path="search/:search" element={<SearchResult />} /> */}
-
-        {/* <Route path="profile" element={<ProfileDetail />} />
-        <Route path="posts/new" element={<EditPost />} />
-        <Route path="posts/edit/:id" element={<EditPost />} />
-        <Route path="profile/settings" element={<ProfileSettings />} /> */}
-
-        {/* <Route path="debugger" element={<AuthDebugger />} /> */}
+        <Route
+          path="profile"
+          element={
+            <RequireAuth>
+              <Profile />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="profile/settings"
+          element={
+            <RequireAuth>
+              <Profile />
+            </RequireAuth>
+          }
+        />
+        <Route
+          path="user/:id/posts"
+          element={
+            <RequireAuth>
+              <UserPosts />
+            </RequireAuth>
+          }
+        />
+        <Route path="debugger" element={<AuthDebugger />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </BrowserRouter>
