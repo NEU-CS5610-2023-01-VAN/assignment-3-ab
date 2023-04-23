@@ -13,13 +13,16 @@ const user = {
   imageUrl: userPNG,
 };
 const isAuthenticated = false;
-const navigation = [{ name: "Home", to: "/", current: false }];
+const navigation = [
+  { name: "Home", to: "/", current: false },
+  { name: "WhisperAPI", to: "/whisperAPI", current: false },
+];
 const userNavigation = isAuthenticated
   ? [
-      { name: "Your Profile", to: "/Profile" },
-      { name: "Profile Settings", to: "/Profile" },
+      { name: "Your Profile", to: "/profile" },
+      { name: "Profile Settings", to: "/profile/settings" },
     ]
-  : [{ name: "Sign In", to: "SignIn" }];
+  : [{ name: "Sign In / Register", to: "/login" }];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -27,7 +30,10 @@ function classNames(...classes) {
 
 export default function Navbar() {
   return (
-    <Disclosure as="header" className="bg-gray-800">
+    <Disclosure
+      as="header"
+      className="bg-gray-800 position: relative top-0 w-full z-50"
+    >
       {({ open }) => (
         <>
           <div className="mx-auto max-w-7xl px-2 sm:px-4 lg:divide-y lg:divide-gray-700 lg:px-8">
@@ -54,6 +60,7 @@ export default function Navbar() {
                       />
                     </div>
                     <input
+                      disabled="true"
                       id="search"
                       name="search"
                       className="block w-full rounded-md border-0 bg-gray-700 py-1.5 pl-10 pr-3 text-gray-300 placeholder:text-gray-400 focus:bg-white focus:text-gray-900 focus:ring-0 focus:placeholder:text-gray-500 sm:text-sm sm:leading-6"
