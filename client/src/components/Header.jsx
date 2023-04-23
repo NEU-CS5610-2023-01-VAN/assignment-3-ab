@@ -12,7 +12,7 @@ const user = {
   email: "chelsea.hagon@example.com",
   imageUrl: userPNG,
 };
-const isAuthenticated = false;
+const isAuthenticated = true;
 const navigation = [
   { name: "Home", to: "/", current: false },
   { name: "WhisperAPI", to: "/whisperAPI", current: false },
