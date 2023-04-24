@@ -16,7 +16,7 @@ const user = {
 const isAuthenticated = true;
 const navigation = [
   { name: "Home", to: "/", current: false },
-  { name: "WhisperAPI", to: "/whisperAPI", current: false },
+  { name: "ExternalAPI", to: "/externalAPI", current: false },
 ];
 const userNavigation = isAuthenticated
   ? [

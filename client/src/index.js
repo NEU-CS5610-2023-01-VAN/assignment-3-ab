@@ -13,7 +13,7 @@ import AuthDebugger from "./components/AuthDebugger";
 import { Auth0Provider, useAuth0 } from "@auth0/auth0-react";
 import { AuthTokenProvider } from "./AuthTokenContext";
 import AppLayout from "./pages/AppLayout";
-import WhisperAPI from "./pages/WhisperAPI";
+import ExternalApi from "./pages/ExternalApi";
 import UserDetails from "./pages/UserDetails";
 
 import reportWebVitals from "./reportWebVitals";
@@ -73,7 +73,7 @@ root.render(
             <Route path="/" element={<AppLayout />}>
               <Route index path="home" element={<Home />} />
               <Route path="posts/:id" element={<PostDetails />} />
-              <Route path="whisperAPI" element={<WhisperAPI />} />
+              <Route path="externalAPI" element={<ExternalApi />} />
               <Route path="users/:id" element={<UserDetails />} />
 
               {/* <Route path="search/:search" element={<SearchResult />} /> */}

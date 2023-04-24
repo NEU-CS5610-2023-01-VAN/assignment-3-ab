@@ -100,8 +100,10 @@ export default function PostDetails() {
       <div className="mx-auto max-w-7xl px-6 lg:px-8 pb-20">
         <div className="mx-auto max-w-2xl">
           <div className="mt-1 space-y-16 border-t border-gray-200 pt-10 sm:mt-10 sm:pt-16">
+            {/* The post */}
             <Article post={post} />
 
+            {/* Comments List */}
             <ul role="list" className="space-y-6">
               {comments.map((commentItem, commentItemIdx) => (
                 <Comment
