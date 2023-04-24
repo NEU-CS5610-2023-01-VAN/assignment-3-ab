@@ -24,7 +24,7 @@ export default function Article({ post }) {
       </div>
       <div className="group relative">
         <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-          <NavLink to={`posts/${post.id}`}>
+          <NavLink to={`/posts/${post.id}`}>
             <span className="absolute inset-0" />
             {post.title}
           </NavLink>
@@ -35,10 +35,10 @@ export default function Article({ post }) {
       </div>
       <div className="flex content-center">
         <div className="relative mt-8 flex items-center gap-x-4">
-          <img src={logoOnly} alt="" className="h-10 w-12 " />
+          <img src={logoOnly} alt="segFault icon" className="h-10 w-12 " />
           <div className="text-sm leading-6 mr-auto">
             <p className="font-semibold text-gray-900">
-              <NavLink to={"users/1"}>
+              <NavLink to={"/users/1"}>
                 {/*Maybe add a href or navlink to that user's profile*/}
                 {/* <span className="absolute inset-0" /> */}
                 {post.author.name}
