@@ -35,9 +35,9 @@ const posts = [
     href: "#",
     description:
       "Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel iusto corrupti dicta laboris incididunt.",
-    date: "2023-04-20T00:00:48.652Z",
+    createdAt: "2023-04-20T00:00:48.652Z",
     datetime: "2020-03-16",
-    category: { title: "Marketing", href: "#" },
+    tag: { name: "C++", href: "#" },
     author: {
       name: "Zia",
       role: "Co-Founder / CTO",

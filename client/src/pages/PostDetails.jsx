@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { SiAnswer } from "react-icons/si";
 import {
   QuestionMarkCircleIcon,
@@ -8,7 +8,7 @@ import {
 import PostInput from "../components/PostInput";
 import { NavLink } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
-import { Fragment, useState } from "react";
+import { Fragment } from "react";
 import { CheckCircleIcon } from "@heroicons/react/24/solid";
 import {
   FaceFrownIcon,
@@ -23,6 +23,10 @@ import { Listbox, Transition } from "@headlessui/react";
 import logoOnly from "../assets/logoOnly.png";
 import Article from "../components/Article";
 import Comment from "../components/Comment";
+import { useNavigate } from "react-router-dom";
+import { useAuthToken } from "../AuthTokenContext";
+import api from "../api/base";
+import { Routes, Route, useParams } from "react-router-dom";
 
 const comments = [
   {
@@ -74,18 +78,46 @@ function classNames(...classes) {
 }
 
 export default function PostDetails() {
+  let { postId } = useParams();
+
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth0();
+  const { accessToken } = useAuthToken();
+
+  const [postDetails, setPostDetails] = useState(null);
+  const [postComments, setPostComments] = useState([]);
+
+  useEffect(() => {
+    async function fetchPostInfo() {
+      try {
+        const response = await api.get(`/question/${postId}`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        setPostDetails(response.data);
+        console.log(response.data);
+        setPostComments(response.data.answers);
+        console.log(response.data.answers);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    if (accessToken) {
+      fetchPostInfo();
+    }
+  }, [accessToken, postId]);
+
   const post = {
-    id: 1,
+    id: 2,
     title: "Boost your conversion rate",
     href: "#",
     description:
       "Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel iusto corrupti dicta laboris incididunt.",
-    date: "Mar 16, 2020",
+    createdAt: "2023-04-20T00:00:48.652Z",
     datetime: "2020-03-16",
-    category: { title: "Marketing", href: "#" },
+    tag: { name: "C++", href: "#" },
     author: {
-      name: "Michael Foster",
-      role: "0 Answers",
+      name: "Zia",
+      role: "Co-Founder / CTO",
       href: "#",
       imageUrl:
         "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
@@ -93,26 +125,37 @@ export default function PostDetails() {
   };
 
   // const { isAuthenticated } = useAuth0();
-  const isAuthenticated = true;
 
   return (
+    postDetails && 
     <div className="bg-white py-10 sm:py-10">
       <div className="mx-auto max-w-7xl px-6 lg:px-8 pb-20">
         <div className="mx-auto max-w-2xl">
           <div className="mt-1 space-y-16 border-t border-gray-200 pt-10 sm:mt-10 sm:pt-16">
             {/* The post */}
-            <Article post={post} />
+            <Article post={postDetails} />
 
             {/* Comments List */}
             <ul role="list" className="space-y-6">
-              {comments.map((commentItem, commentItemIdx) => (
+              {postComments.length > 1 ? (
+                postComments.map((commentItem, commentItemIdx) => (
+                  <Comment
+                    key={commentItem.id}
+                    commentItem={commentItem}
+                    commentItemIdx={commentItemIdx}
+                    commentsListLength={comments.length}
+                  />
+                ))
+              ) : postComments.length === 1 ? (
                 <Comment
-                  key={commentItem.id}
-                  commentItem={commentItem}
-                  commentItemIdx={commentItemIdx}
-                  commentsListLength={comments.length}
+                  key={postComments[0].id}
+                  commentItem={postComments[0]}
+                  commentItemIdx={0}
+                  commentsListLength={1}
                 />
-              ))}
+              ) : (
+                <></>
+              )}
             </ul>
 
             {/* New comment form */}

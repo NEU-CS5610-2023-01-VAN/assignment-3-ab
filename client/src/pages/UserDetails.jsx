@@ -1,9 +1,20 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { PaperClipIcon } from "@heroicons/react/20/solid";
 import { useNavigate } from "react-router-dom";
+import { useAuthToken } from "../AuthTokenContext";
+import api from "../api/base";
+import { useAuth0 } from "@auth0/auth0-react";
+import { Routes, Route, useParams } from "react-router-dom";
 
 export default function Profile() {
+  // let { postId } = useParams();
+
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth0();
+  const { accessToken } = useAuthToken();
+
+  const [postDetails, setPostDetails] = useState("");
+
   return (
     <div className="bg-white py-15 sm:py-15 pb-20 mt-10">
       <div className="mx-auto max-w-7xl px-6 lg:px-8 pb-10">

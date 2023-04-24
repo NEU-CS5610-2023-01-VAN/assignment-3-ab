@@ -10,6 +10,7 @@ import logoOnly from "../assets/logoOnly.png";
 import { useAuth0 } from "@auth0/auth0-react";
 
 export default function Article({ post, specific }) {
+  console.log("post in article", post)
   const { user, isAuthenticated } = useAuth0();
   function fixTime(originalTime) {
     // remove the timezone indicators

@@ -71,7 +71,7 @@ root.render(
             {/* Routes with header and footer common components */}
             <Route path="/" element={<AppLayout />}>
               <Route index path="home" element={<Home />} />
-              <Route path="posts/:id" element={<PostDetails />} />
+              <Route path="posts/:postId" element={<PostDetails />} />
               <Route path="externalAPI" element={<ExternalApi />} />
               <Route path="users/:id" element={<UserDetails />} />
 
