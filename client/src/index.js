@@ -14,6 +14,7 @@ import { Auth0Provider, useAuth0 } from "@auth0/auth0-react";
 import { AuthTokenProvider } from "./AuthTokenContext";
 import AppLayout from "./pages/AppLayout";
 import WhisperAPI from "./pages/WhisperAPI";
+import UserDetails from "./pages/UserDetails";
 
 import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
@@ -73,13 +74,14 @@ root.render(
               <Route index path="home" element={<Home />} />
               <Route path="posts/:id" element={<PostDetails />} />
               <Route path="whisperAPI" element={<WhisperAPI />} />
+              <Route path="users/:id" element={<UserDetails />} />
 
               {/* <Route path="search/:search" element={<SearchResult />} /> */}
               <Route
                 path="profile"
                 element={
                   // <RequireAuth>
-                    <Profile />
+                  <Profile />
                   // </RequireAuth>
                 }
               />
@@ -87,7 +89,7 @@ root.render(
                 path="profile/settings"
                 element={
                   // <RequireAuth>
-                    <ProfileSettings />
+                  <ProfileSettings />
                   // </RequireAuth>
                 }
               />

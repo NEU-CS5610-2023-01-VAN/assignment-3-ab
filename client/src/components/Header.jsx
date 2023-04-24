@@ -6,6 +6,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/20/solid";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import userPNG from "../assets/user.png";
 import logo from "../assets/segFaultLogo.png";
+import { useNavigate } from "react-router-dom";
 
 const user = {
   name: "Chelsea Hagon",
@@ -19,7 +20,7 @@ const navigation = [
 ];
 const userNavigation = isAuthenticated
   ? [
-      { name: "Your Profile", to: "/profile" },
+      { name: "My Profile", to: "/profile" },
       { name: "Profile Settings", to: "/profile/settings" },
     ]
   : [{ name: "Sign In / Register", to: "/login" }];
@@ -29,6 +30,7 @@ function classNames(...classes) {
 }
 
 export default function Navbar() {
+  const navigate = useNavigate();
   return (
     <Disclosure
       as="header"
@@ -41,7 +43,8 @@ export default function Navbar() {
               <div className="relative z-10 flex px-2 lg:px-0">
                 <div className="flex flex-shrink-0 items-center">
                   <img
-                    className="block h-12 w-auto"
+                    onClick={() => navigate("/")}
+                    className="block h-12 w-auto cursor-pointer"
                     src={logo}
                     alt="segFault logo"
                   />
@@ -60,7 +63,7 @@ export default function Navbar() {
                       />
                     </div>
                     <input
-                      disabled="true"
+                      disabled={true}
                       id="search"
                       name="search"
                       className="block w-full rounded-md border-0 bg-gray-700 py-1.5 pl-10 pr-3 text-gray-300 placeholder:text-gray-400 focus:bg-white focus:text-gray-900 focus:ring-0 focus:placeholder:text-gray-500 sm:text-sm sm:leading-6"
