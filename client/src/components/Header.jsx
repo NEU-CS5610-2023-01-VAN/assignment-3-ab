@@ -7,23 +7,13 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import userPNG from "../assets/user.png";
 import logo from "../assets/segFaultLogo.png";
 import { useNavigate } from "react-router-dom";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const user = {
   name: "Chelsea Hagon",
   email: "chelsea.hagon@example.com",
   imageUrl: userPNG,
 };
-const isAuthenticated = true;
-const navigation = [
-  { name: "Home", to: "/", current: false },
-  { name: "ExternalAPI", to: "/externalAPI", current: false },
-];
-const userNavigation = isAuthenticated
-  ? [
-      { name: "My Profile", to: "/profile" },
-      { name: "Profile Settings", to: "/profile/settings" },
-    ]
-  : [{ name: "Sign In / Register", to: "/login" }];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -31,6 +21,20 @@ function classNames(...classes) {
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const { user , isAuthenticated} = useAuth0();
+  // const isAuthenticated = false
+
+  const navigation = [
+    { name: "Home", to: "/", current: false },
+    { name: "ExternalAPI", to: "/externalAPI", current: false },
+  ];
+  const userNavigation = isAuthenticated
+    ? [
+        { name: "My Profile", to: "/profile" },
+        { name: "Edit Profile Details", to: "/profile/settings" },
+      ]
+    : [{ name: "Sign In / Register", to: "/login" }];
+
   return (
     <Disclosure
       as="header"
@@ -92,7 +96,7 @@ export default function Navbar() {
                       <span className="sr-only">Open user menu</span>
                       <img
                         className="h-8 w-8 rounded-full"
-                        src={user.imageUrl}
+                        src={isAuthenticated ? user.picture : userPNG}
                         alt=""
                       />
                     </Menu.Button>
@@ -173,16 +177,16 @@ export default function Navbar() {
                 <div className="flex-shrink-0">
                   <img
                     className="h-10 w-10 rounded-full"
-                    src={user.imageUrl}
+                    src={isAuthenticated ? user.picture : userPNG}
                     alt=""
                   />
                 </div>
                 <div className="ml-3">
                   <div className="text-base font-medium text-white">
-                    {user.name}
+                    {isAuthenticated ? user.name : ""}
                   </div>
                   <div className="text-sm font-medium text-gray-400">
-                    {user.email}
+                    {isAuthenticated ? user.email : ""}
                   </div>
                 </div>
                 <button

@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useAuthToken } from "../AuthTokenContext";
 import { useNavigate } from "react-router-dom";
+import Loading from "./Loading";
 
 export default function VerifyUser() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function VerifyUser() {
       const user = await data.json();
 
       if (user.auth0Id) {
-        navigate("/app");
+        navigate("/");
       }
     }
 
@@ -27,9 +28,5 @@ export default function VerifyUser() {
     }
   }, [accessToken]);
 
-  return (
-    <div className="flex items-center content-around bg-cyan-900 text-lime-50 h-full text-5xl">
-      Loading...
-    </div>
-  );
+  return <Loading />;
 }

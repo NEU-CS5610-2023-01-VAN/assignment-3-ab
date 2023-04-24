@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 export default function LogIn() {
   const navigate = useNavigate();
-  const { isAuthenticated, loginWithRedirect, isLoading } = useAuth0();
+  const { isAuthenticated, loginWithRedirect, user } = useAuth0();
   const signUp = () => loginWithRedirect({ screen_hint: "signup" });
 
   return (
@@ -23,14 +23,14 @@ export default function LogIn() {
           </p>
           <div className="mt-10 flex items-center justify-center gap-x-6">
             <NavLink
-              onClick={loginWithRedirect}
+              onClick={signUp}
               // href="#"
               className="rounded-md bg-white px-3.5 py-2.5 text-sm font-semibold text-gray-900 shadow-sm hover:bg-gray-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
             >
               Register
             </NavLink>
             <NavLink
-              onClick={signUp}
+              onClick={loginWithRedirect}
               // href="#"
               className="text-sm font-semibold leading-6 text-white"
             >

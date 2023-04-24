@@ -5,6 +5,7 @@ import pkg from "@prisma/client";
 import morgan from "morgan";
 import cors from "cors";
 import { auth } from "express-oauth2-jwt-bearer";
+import { Configuration, OpenAIApi } from "openai";
 
 const requireAuth = auth({
   audience: process.env.AUTH0_AUDIENCE,
@@ -22,9 +23,29 @@ app.use(morgan("dev"));
 const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
 
+// ChatGPT API  setup
+const config = new Configuration({
+  apiKey: process.env.OPEN_AI_API_KEY,
+});
+const openai = new OpenAIApi(config);
+
 // GET: extra endpoint added to a service for the sole purpose of expressing its availability
 app.get("/ping", (req, res) => {
   res.send("pong");
+});
+
+// CHAT GPT
+app.post("/chat", async (req, res) => {
+  const { prompt } = req.body;
+
+  const completion = await openai.createCompletion({
+    model: "text-davinci-003",
+    max_tokens: 512,
+    temperature: 0,
+    prompt: prompt,
+  });
+
+  res.send(completion.data.choices[0].text);
 });
 
 // *** POST *** //
@@ -126,6 +147,7 @@ app.post("/question", requireAuth, async (req, res) => {
     const newQuestion = await prisma.question.create({
       data: {
         title,
+        body,
         author: { connect: { auth0Id } },
         tag: { connect: { id: parseInt(tagID) } },
       },
@@ -203,10 +225,11 @@ app.get("/profile", requireAuth, async (req, res) => {
 
 // GET list of all questions
 app.get("/questions", async (req, res) => {
-  const reviews = await prisma.question.findMany({
-    include: { tag: true, answers: true },
+  const questions = await prisma.question.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { author: true, tag: true, answers: true },
   });
-  res.status(200).json(reviews);
+  res.status(200).json(questions);
 });
 
 // GET - a question by id
@@ -242,17 +265,22 @@ app.get("/answer/:id", async (req, res) => {
 });
 
 // // GET user-specific questions with AUTH
-app.get("/questions", requireAuth, async (req, res) => {
+app.get("/questions/user", requireAuth, async (req, res) => {
   const auth0Id = req.auth.payload.sub;
 
   const user = await prisma.user.findUnique({
     where: {
       auth0Id,
     },
-    include: { questions: { include: { answers: true } } },
+    include: {
+      questions: {
+        orderBy: { createdAt: "desc" },
+        include: { answers: true, tag: true },
+      },
+    },
   });
 
-  res.json(user);
+  res.json(user.questions);
 });
 
 // // GET user-specific questions without Auth ---------------------------------------------------------------------------------

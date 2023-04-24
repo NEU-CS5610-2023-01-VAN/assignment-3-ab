@@ -3,7 +3,7 @@ import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
 
 export default function ProfileSettings() {
   return (
-    <div className="bg-white py-15 sm:py-15 pb-20 mt-10">
+    <div className="bg-white py-15 sm:py-15 pb-20 pt-10">
       <div className="mx-auto max-w-7xl px-6 lg:px-8 pb-10">
         <div className="mx-auto max-w-2xl">
           <form className="border-2 rounded-lg p-5 border-gray-200">

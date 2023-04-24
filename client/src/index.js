@@ -65,7 +65,6 @@ root.render(
       <AuthTokenProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Home />} />
             <Route path="/login" element={<LogIn />} />
             <Route path="/verify-user" element={<VerifyUser />} />
 
@@ -101,6 +100,7 @@ root.render(
                   </RequireAuth>
                 }
               /> */}
+              <Route path="/" element={<Navigate to="/home" replace />} />
             </Route>
             <Route path="debugger" element={<AuthDebugger />} />
             <Route path="*" element={<NotFound />} />

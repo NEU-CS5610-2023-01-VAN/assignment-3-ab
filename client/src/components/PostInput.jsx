@@ -6,32 +6,57 @@ import {
   TagIcon,
   UserCircleIcon,
 } from "@heroicons/react/20/solid";
+import axios from "axios";
+import { useAuthToken } from "../AuthTokenContext";
+import api from "../api/base";
+import { NavLink, useNavigate } from "react-router-dom";
 
 const labels = [
-  { name: "Untagged", value: null },
-  { name: "Python", value: "python" },
-  { name: "C", value: "c" },
-  { name: "C++", value: "c++" },
-  { name: "Java", value: "java" },
-  { name: "JavaScript", value: "javascript" },
-  { name: "Rust", value: "rust" },
-  { name: "React", value: "react" },
-  { name: "Go", value: "go" },
-  { name: "C#", value: "c#" },
-  { name: "General", value: "general" },
-  { name: "Vue", value: "vue" },
-  { name: "SQL", value: "sql" },
+  { name: "General", value: null, id: 11 },
+  { name: "Python", value: "python", id: 1 },
+  { name: "C", value: "c", id: 2 },
+  { name: "C++", value: "c++", id: 3 },
+  { name: "Java", value: "java", id: 4 },
+  { name: "JavaScript", value: "javascript", id: 5 },
+  { name: "Rust", value: "rust", id: 6 },
+  { name: "React", value: "react", id: 7 },
+  { name: "Go", value: "go", id: 8 },
+  { name: "C#", value: "c#", id: 9 },
 ];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
-export default function PostInput() {
+export default function PostInput({ userQuestions, setUserQuestions }) {
+  const { accessToken } = useAuthToken();
+  const navigate = useNavigate();
+
+  const [title, setTitle] = useState("");
+  const [body, setBody] = useState("");
   const [labelled, setLabelled] = useState(labels[0]);
 
+  async function handleSubmit(e) {
+    e.preventDefault();
+
+    // const datetime = new Date(Date.UTC()).toLocaleString;
+    const newQuestion = { title, body, tagID: labelled.id };
+    try {
+      const response = await api.post("/question", newQuestion, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      const updatedUserQuestions = [...userQuestions, response.data];
+      setUserQuestions(updatedUserQuestions);
+      setTitle("");
+      setBody("");
+      navigate("/");
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
+  }
+
   return (
-    <form action="#" className="relative">
+    <form onSubmit={handleSubmit} className="relative">
       <div className="mb-20 overflow-hidden rounded-lg border border-gray-300 shadow-sm focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
         <label htmlFor="title" className="sr-only">
           Title
@@ -42,17 +67,19 @@ export default function PostInput() {
           id="title"
           className="block w-full border-0 pt-2.5 text-lg font-medium placeholder:text-gray-400 focus:ring-0"
           placeholder="Title"
+          onChange={(e) => setTitle(e.target.value)}
         />
         <label htmlFor="description" className="sr-only">
-          Description
+          body
         </label>
         <textarea
           rows={2}
-          name="description"
-          id="description"
+          name="body"
+          id="body"
           className="block w-full resize-none border-0 py-0 text-gray-900 placeholder:text-gray-400 focus:ring-0 sm:text-sm sm:leading-6"
           placeholder="Write a description..."
           defaultValue={""}
+          onChange={(e) => setBody(e.target.value)}
         />
 
         {/* Spacer element to match the height of the toolbar */}

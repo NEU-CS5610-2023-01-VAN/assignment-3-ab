@@ -107,6 +107,7 @@ export default function PostDetails() {
             <ul role="list" className="space-y-6">
               {comments.map((commentItem, commentItemIdx) => (
                 <Comment
+                  key={commentItem.id}
                   commentItem={commentItem}
                   commentItemIdx={commentItemIdx}
                   commentsListLength={comments.length}

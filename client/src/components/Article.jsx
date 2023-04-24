@@ -7,19 +7,45 @@ import {
 } from "@heroicons/react/20/solid";
 import { NavLink } from "react-router-dom";
 import logoOnly from "../assets/logoOnly.png";
+import { useAuth0 } from "@auth0/auth0-react";
 
-export default function Article({ post }) {
+export default function Article({ post, specific }) {
+  const { user, isAuthenticated } = useAuth0();
+  function fixTime(originalTime) {
+    // remove the timezone indicators
+    const strippedTime = originalTime.replace("T", " ").replace("Z", "");
+
+    // split date and time
+    var splitTime = strippedTime.split(/[- :]/);
+
+    // Apply each element to the Date function
+    var fixedTime = new Date(
+      Date.UTC(
+        splitTime[0],
+        splitTime[1] - 1,
+        splitTime[2],
+        splitTime[3],
+        splitTime[4],
+        splitTime[5]
+      )
+    ).toLocaleString("en-US");
+
+    return fixedTime;
+  }
+
   return (
     <article
       key={post.id}
-      className="p-6 flex flex-col justify-between border-4 border-gray-400 shadow-lg hover:bg-gray-100"
+      className={`p-6 flex flex-col justify-between border-4 border-${
+        specific ? "indigo" : "gray"
+      }-400 shadow-lg hover:bg-gray-100`}
     >
       <div className="flex items-center gap-x-4 text-xs">
-        <time dateTime={post.datetime} className="text-gray-500">
-          {post.date}
+        <time dateTime={post.createdAt} className="text-gray-500">
+          {fixTime(post.createdAt)}
         </time>
         <p className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600">
-          {post.category.title}
+          {post.tag.name}
         </p>
       </div>
       <div className="group relative">
@@ -30,7 +56,7 @@ export default function Article({ post }) {
           </NavLink>
         </h3>
         <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">
-          {post.description}
+          {post.body}
         </p>
       </div>
       <div className="flex content-center">
@@ -41,7 +67,7 @@ export default function Article({ post }) {
               <NavLink to={"/users/1"}>
                 {/*Maybe add a href or navlink to that user's profile*/}
                 {/* <span className="absolute inset-0" /> */}
-                {post.author.name}
+                {specific ? user.name : post.author.name}
               </NavLink>
             </p>
             <p className="text-gray-600 flex items-center">
