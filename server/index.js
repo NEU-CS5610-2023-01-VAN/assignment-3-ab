@@ -347,7 +347,7 @@ app.get("/answers", requireAuth, async (req, res) => {
     include: { answers: { include: { question: true } } },
   });
 
-  res.json(user);
+  res.json(user.answers);
 });
 
 // *** PUT *** //
