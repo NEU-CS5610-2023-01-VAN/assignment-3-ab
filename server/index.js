@@ -204,7 +204,7 @@ app.get("/profile", requireAuth, async (req, res) => {
     where: {
       auth0Id,
     },
-    include: { questions: { include: { answers } } },
+    // include: { questions: { include: { answers } } },
   });
 
   res.json(user);
@@ -352,25 +352,51 @@ app.get("/answers", requireAuth, async (req, res) => {
 
 // *** PUT *** //
 
-// PUT: update an existing user without Auth ---------------------------------------------------------------------------------
-app.put("/user/:id", async (req, res) => {
-  if (!req.params.id) {
-    res.status(401).send("Incorrect input values");
-  }
+// // PUT: update an existing user without Auth ---------------------------------------------------------------------------------
+// app.put("/user/:id", async (req, res) => {
+//   if (!req.params.id) {
+//     res.status(401).send("Incorrect input values");
+//   }
+
+//   const { updatedEmail, updatedName } = req.body;
+//   try {
+//     const updatedUser = await prisma.user.update({
+//       where: {
+//         id: parseInt(req.params.id),
+//       },
+//       data: {
+//         email: updatedEmail,
+//         name: updatedName,
+//       },
+//     });
+//   } catch (e) {
+//     return res.status(404).send();
+//   }
+
+//   res.status(200).send();
+// });
+
+// PUT: update an existing user with Auth
+app.put("/user", requireAuth, async (req, res) => {
+  const auth0Id = req.auth.payload.sub;
 
   const { updatedEmail, updatedName } = req.body;
-  try {
-    const updatedUser = await prisma.user.update({
-      where: {
-        id: parseInt(req.params.id),
-      },
-      data: {
-        email: updatedEmail,
-        name: updatedName,
-      },
-    });
-  } catch (e) {
-    return res.status(404).send();
+  if (!updatedEmail || !updatedName) {
+    res.status(400).send("Email and Name are required");
+  } else {
+    try {
+      const updatedUser = await prisma.user.update({
+        where: {
+          auth0Id,
+        },
+        data: {
+          email: updatedEmail,
+          name: updatedName,
+        },
+      });
+    } catch (e) {
+      return res.status(404).send();
+    }
   }
 
   res.status(200).send();
@@ -378,25 +404,25 @@ app.put("/user/:id", async (req, res) => {
 
 // *** DELETE *** //
 
-// DELETE: delete an existing user
-app.delete("/users/:id", async (req, res) => {
-  if (!req.params.id) {
-    res.status(401).send("Incorrect input values");
-  }
+// // DELETE: delete an existing user
+// app.delete("/users/:id", async (req, res) => {
+//   if (!req.params.id) {
+//     res.status(401).send("Incorrect input values");
+//   }
 
-  const userID = Number(req.params.id);
-  try {
-    const deletedAnswer = await prisma.user.delete({
-      where: {
-        id: userID,
-      },
-    });
-  } catch (e) {
-    return res.status(404).send();
-  }
+//   const userID = Number(req.params.id);
+//   try {
+//     const deletedAnswer = await prisma.user.delete({
+//       where: {
+//         id: userID,
+//       },
+//     });
+//   } catch (e) {
+//     return res.status(404).send();
+//   }
 
-  res.status(200).send();
-});
+//   res.status(200).send();
+// });
 
 // DELETE: delete an existing question
 app.delete("/questions/:id", requireAuth, async (req, res) => {

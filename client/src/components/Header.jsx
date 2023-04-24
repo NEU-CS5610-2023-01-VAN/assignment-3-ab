@@ -21,7 +21,7 @@ function classNames(...classes) {
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const { user , isAuthenticated} = useAuth0();
+  const { user, isAuthenticated } = useAuth0();
   // const isAuthenticated = false
 
   const navigation = [

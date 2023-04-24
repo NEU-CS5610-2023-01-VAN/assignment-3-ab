@@ -34,6 +34,26 @@ export default function Profile() {
   const [tabItems, setTabItems] = useState(null);
   const [articlesShown, setArticlesShown] = useState(null);
 
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    async function fetchUserInfo() {
+      try {
+        const response = await api.get("/profile", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        setUsername(response.data.name);
+        setEmail(response.data.email);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    if (accessToken) {
+      trackPromise(fetchUserInfo());
+    }
+  }, [accessToken]);
+
   useEffect(() => {
     async function fetchUserActivity() {
       try {
@@ -176,7 +196,7 @@ export default function Profile() {
                       User Name
                     </dt>
                     <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                      {user.name}
+                      {username}
                     </dd>
                   </div>
                   <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -184,7 +204,7 @@ export default function Profile() {
                       Email Address
                     </dt>
                     <dd className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-                      {user.email}
+                      {email}
                     </dd>
                   </div>
                   {/* <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">

@@ -2,9 +2,35 @@ import React, { useEffect, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/20/solid";
 import { NavLink, useNavigate, useNavigation } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
+import axios from "axios";
+import { trackPromise } from "react-promise-tracker";
+import { useAuthToken } from "../AuthTokenContext";
+import api from "../api/base";
 
 export default function Banner() {
+  const { accessToken } = useAuthToken();
   const { isAuthenticated, user } = useAuth0();
+
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    async function fetchUserInfo() {
+      try {
+        const response = await api.get("/profile", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        setUsername(response.data.name);
+        setEmail(response.data.email);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    if (accessToken) {
+      trackPromise(fetchUserInfo());
+    }
+  }, [accessToken]);
+
   return (
     <div className="relative isolate flex items-center gap-x-6 overflow-hidden bg-gray-50 px-6 py-2.5 sm:px-3.5 sm:before:flex-1">
       <div
@@ -36,7 +62,7 @@ export default function Banner() {
           <strong className="font-semibold">
             {!isAuthenticated
               ? "Want to post a question?"
-              : `Welcome back, ${user.name}`}
+              : `Welcome back, ${username}`}
           </strong>
           <svg
             viewBox="0 0 2 2"
@@ -44,12 +70,15 @@ export default function Banner() {
             aria-hidden="true"
           ></svg>
         </p>
-        {!isAuthenticated && <NavLink
-          to={"/login"}
-          className="flex-none rounded-full bg-gray-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
-        >
-          Join our growing community now <span aria-hidden="true">&rarr;</span>
-        </NavLink>}
+        {!isAuthenticated && (
+          <NavLink
+            to={"/login"}
+            className="flex-none rounded-full bg-gray-900 px-3.5 py-1 text-sm font-semibold text-white shadow-sm hover:bg-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-900"
+          >
+            Join our growing community now{" "}
+            <span aria-hidden="true">&rarr;</span>
+          </NavLink>
+        )}
       </div>
       <div className="flex flex-1 justify-end">
         {/* <button

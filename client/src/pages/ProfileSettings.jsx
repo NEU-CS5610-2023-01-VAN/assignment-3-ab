@@ -1,12 +1,67 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { PhotoIcon, UserCircleIcon } from "@heroicons/react/24/solid";
+import axios from "axios";
+import { trackPromise } from "react-promise-tracker";
+import { useAuthToken } from "../AuthTokenContext";
+import api from "../api/base";
+import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
 
 export default function ProfileSettings() {
+  const { user, isAuthenticated } = useAuth0();
+  const { accessToken } = useAuthToken();
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+
+  const [updatedEmail, setUpdatedEmail] = useState("");
+  const [updatedUsername, setUpdatedUsername] = useState("");
+
+  useEffect(() => {
+    async function fetchUserInfo() {
+      try {
+        const response = await api.get("/profile", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
+        setUsername(response.data.name);
+        setUpdatedUsername(response.data.name);
+        setEmail(response.data.email);
+        setUpdatedEmail(response.data.email);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+    if (accessToken) {
+      trackPromise(fetchUserInfo());
+    }
+  }, [accessToken]);
+
+  async function handleEdit() {
+    console.log("we here?");
+    const updatedUserInfo = { updatedEmail, updatedName: updatedUsername };
+    try {
+      const response = await api.put("/user", updatedUserInfo, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      setEmail(updatedEmail);
+      setUsername(updatedUsername);
+      setUpdatedEmail("");
+      setUpdatedUsername("");
+      navigate("/profile", { replace: true });
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
+  }
+
   return (
     <div className="bg-white py-15 sm:py-15 pb-20 pt-10">
       <div className="mx-auto max-w-7xl px-6 lg:px-8 pb-10">
         <div className="mx-auto max-w-2xl">
-          <form className="border-2 rounded-lg p-5 border-gray-200">
+          <form
+            onSubmit={handleEdit}
+            className="border-2 rounded-lg p-5 border-gray-200"
+          >
             <div className="space-y-12">
               <div className="border-b border-gray-900/10 pb-12">
                 <h2 className="text-base font-semibold leading-7 text-gray-900">
@@ -30,8 +85,10 @@ export default function ProfileSettings() {
                         <input
                           id="username"
                           name="username"
-                          type="email"
+                          type="text"
                           className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          value={updatedUsername}
+                          onChange={(e) => setUpdatedUsername(e.target.value)}
                         />
                       </div>
                     </div>
@@ -52,12 +109,14 @@ export default function ProfileSettings() {
                           type="email"
                           autoComplete="email"
                           className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                          value={updatedEmail}
+                          onChange={(e) => setUpdatedEmail(e.target.value)}
                         />
                       </div>
                     </div>
                   </div>
 
-                  <div className="sm:col-span-4">
+                  {/* <div className="sm:col-span-4">
                     <label
                       htmlFor="username"
                       className="block text-sm font-medium leading-6 text-gray-900"
@@ -74,7 +133,7 @@ export default function ProfileSettings() {
                         />
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   <div className="col-span-full">
                     <label
@@ -88,8 +147,9 @@ export default function ProfileSettings() {
                         id="about"
                         name="about"
                         rows={3}
-                        className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                        className="block w-full bg-gray-300 rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                         defaultValue={""}
+                        disabled={true}
                       />
                     </div>
                     <p className="mt-3 text-sm leading-6 text-gray-600">
@@ -125,6 +185,7 @@ export default function ProfileSettings() {
               <button
                 type="button"
                 className="text-sm font-semibold leading-6 text-gray-900"
+                onClick={() => navigate("/profile")}
               >
                 Cancel
               </button>
