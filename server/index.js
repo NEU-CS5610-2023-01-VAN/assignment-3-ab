@@ -23,7 +23,7 @@ app.use(morgan("dev"));
 const { PrismaClient } = pkg;
 const prisma = new PrismaClient();
 
-// ChatGPT API  setup
+// OpenAI API  setup
 const config = new Configuration({
   apiKey: process.env.OPEN_AI_API_KEY,
 });
@@ -34,7 +34,7 @@ app.get("/ping", (req, res) => {
   res.send("pong");
 });
 
-// CHAT GPT
+// OPEN AI API
 app.post("/chat", async (req, res) => {
   const { prompt } = req.body;
 
@@ -49,25 +49,6 @@ app.post("/chat", async (req, res) => {
 });
 
 // *** POST *** //
-
-// // POST - creates a user without Auth ---------------------------------------------------------------------------------
-// app.post("/user", async (req, res) => {
-//   const { email, name } = req.body;
-
-//   if (!email) {
-//     res.status(400).send("Email is required");
-//   } else {
-//     const newUser = await prisma.user.create({
-//       data: {
-//         email,
-//         name,
-//       },
-//     });
-
-//     res.status(201).json(newUser);
-//   }
-// });
-
 // verify user status, if not registered in our database we will create it
 app.post("/verify-user", requireAuth, async (req, res) => {
   const auth0Id = req.auth.payload.sub;
@@ -94,46 +75,6 @@ app.post("/verify-user", requireAuth, async (req, res) => {
     res.json(newUser);
   }
 });
-
-// // POST - creates a question without Auth ---------------------------------------------------------------------------------
-// app.post("/question", async (req, res) => {
-//   const { title, body, tagID, userID } = req.body;
-
-//   if (!title || !body || !tagID | !userID) {
-//     res.status(400).send("Title, body and tagID, userID are required");
-//   } else {
-//     const newQuestion = await prisma.question.create({
-//       data: {
-//         title,
-//         body,
-//         author: { connect: { id: parseInt(userID) } },
-//         tag: { connect: { id: parseInt(tagID) } },
-//       },
-//       include: { answers: true, tag: true, author: true },
-//     });
-
-//     res.status(201).json(newQuestion);
-//   }
-// });
-
-// // POST - creates an answer without Auth ---------------------------------------------------------------------------------
-// app.post("/answer", async (req, res) => {
-//   const { content, questionID, userID } = req.body;
-
-//   if (!content || !questionID | !userID) {
-//     res.status(400).send("Content and questionID are required");
-//   } else {
-//     const newAnswer = await prisma.answer.create({
-//       data: {
-//         content,
-//         author: { connect: { id: parseInt(userID) } },
-//         question: { connect: { id: parseInt(questionID) } },
-//       },
-//     });
-
-//     res.status(201).json(newAnswer);
-//   }
-// });
 
 // POST - creates a question
 app.post("/question", requireAuth, async (req, res) => {
@@ -162,7 +103,6 @@ app.post("/answer", requireAuth, async (req, res) => {
   const auth0Id = req.auth.payload.sub;
 
   const { content, questionID } = req.body;
-  console.log(content, questionID);
 
   if (!content || !questionID) {
     res.status(400).send("Content and questionID are required");
@@ -179,24 +119,6 @@ app.post("/answer", requireAuth, async (req, res) => {
     res.status(201).json(newAnswer);
   }
 });
-
-// *** GET *** //
-
-// // GET - a user by id without Auth ---------------------------------------------------------------------------------
-// app.get("/user/:id", async (req, res) => {
-//   const id = req.params.id;
-//   if (!id) {
-//     res.status(400).send("User ID is required");
-//   }
-//   const user = await prisma.user.findUnique({
-//     where: {
-//       id: parseInt(id),
-//     },
-//     include: { questions: true, answers: true },
-//   });
-
-//   res.status(201).json(user);
-// });
 
 // GET Profile information of authenticated user
 app.get("/profile", requireAuth, async (req, res) => {
@@ -289,23 +211,6 @@ app.get("/questions/user", requireAuth, async (req, res) => {
   res.json(user.questions);
 });
 
-// // GET user-specific questions without Auth ---------------------------------------------------------------------------------
-// app.get("/questions/user/:id", async (req, res) => {
-//   const userId = req.params.id;
-//   if (!userId) {
-//     res.status(400).send("User ID is required");
-//   }
-
-//   const userQuestions = await prisma.user.findUnique({
-//     where: {
-//       id: parseInt(userId),
-//     },
-//     include: { questions: true },
-//   });
-
-//   res.json(userQuestions);
-// });
-
 // GET list of all questions under a tag
 app.get("/questions/:tag", async (req, res) => {
   if (!req.params.tag) {
@@ -326,22 +231,6 @@ app.get("/questions/:tag", async (req, res) => {
   }
 });
 
-// // GET user-specific answers - no Auth0 ///// / /   //////  / / / / / / / / / / / / //  / / / / / //  / //  / / / / //  / / /
-// app.get("/answers/user/:id", async (req, res) => {
-//   const userId = req.params.id;
-//   if (!userId) {
-//     res.status(400).send("user ID is required");
-//   }
-//   const userAnswers = await prisma.user.findUnique({
-//     where: {
-//       id: parseInt(userId),
-//     },
-//     include: { answers: true },
-//   });
-
-//   res.json(userAnswers);
-// });
-
 // GET user-specific answers
 app.get("/answers", requireAuth, async (req, res) => {
   const auth0Id = req.auth.payload.sub;
@@ -357,31 +246,6 @@ app.get("/answers", requireAuth, async (req, res) => {
 });
 
 // *** PUT *** //
-
-// // PUT: update an existing user without Auth ---------------------------------------------------------------------------------
-// app.put("/user/:id", async (req, res) => {
-//   if (!req.params.id) {
-//     res.status(401).send("Incorrect input values");
-//   }
-
-//   const { updatedEmail, updatedName } = req.body;
-//   try {
-//     const updatedUser = await prisma.user.update({
-//       where: {
-//         id: parseInt(req.params.id),
-//       },
-//       data: {
-//         email: updatedEmail,
-//         name: updatedName,
-//       },
-//     });
-//   } catch (e) {
-//     return res.status(404).send();
-//   }
-
-//   res.status(200).send();
-// });
-
 // PUT: update an existing user with Auth
 app.put("/user", requireAuth, async (req, res) => {
   const auth0Id = req.auth.payload.sub;
@@ -474,163 +338,3 @@ app.delete("/answers/:id", requireAuth, async (req, res) => {
 app.listen(8000, () => {
   console.log("Server running on http://localhost:8000 🎉 🚀");
 });
-
-// // get a todo item by id
-// app.get("/todos/:id", requireAuth, async (req, res) => {
-//   const id = req.params.id;
-//   const todoItem = await prisma.todoItem.findUnique({
-//     where: {
-//       id,
-//     },
-//   });
-//   res.json(todoItem);
-// });
-
-// // updates a todo item by id
-// app.put("/todos/:id", requireAuth, async (req, res) => {
-//   const id = req.params.id;
-//   const { title } = req.body;
-//   const updatedItem = await prisma.todoItem.update({
-//     where: {
-//       id,
-//     },
-//     data: {
-//       title,
-//     },
-//   });
-//   res.json(updatedItem);
-// });
-
-// // get Profile information of authenticated user
-// app.get("/me", requireAuth, async (req, res) => {
-//   const auth0Id = req.auth.payload.sub;
-
-//   const user = await prisma.user.findUnique({
-//     where: {
-//       auth0Id,
-//     },
-//   });
-
-//   res.json(user);
-// });
-
-// // verify user status, if not registered in our database we will create it
-// app.post("/verify-user", requireAuth, async (req, res) => {
-//   const auth0Id = req.auth.payload.sub;
-//   const email = req.auth.payload[`${process.env.AUTH0_AUDIENCE}/email`];
-//   const name = req.auth.payload[`${process.env.AUTH0_AUDIENCE}/name`];
-
-//   const user = await prisma.user.findUnique({
-//     where: {
-//       auth0Id,
-//     },
-//   });
-
-//   if (user) {
-//     res.json(user);
-//   } else {
-//     const newUser = await prisma.user.create({
-//       data: {
-//         email,
-//         auth0Id,
-//         name,
-//       },
-//     });
-
-//     res.json(newUser);
-//   }
-// });
-
-// // POST: create a new review
-// app.post("/reviews", async (req, res) => {
-//   if (!req.body.bookName || !req.body.reviewTitle || !req.body.reviewText) {
-//     res.status(401).send("Incorrect input values");
-//   }
-
-//   const { bookName, reviewTitle, reviewText } = req.body;
-//   const reviewItem = await prisma.reviewItem.create({
-//     data: {
-//       bookName,
-//       reviewTitle,
-//       reviewText,
-//     },
-//   });
-
-//   // const newReview = createReview(
-//   //     req.body.bookName,
-//   //     req.body.reviewTitle,
-//   //     req.body.reviewText
-//   // );
-
-//   res.status(201).json(reviewItem);
-// });
-
-// // GET: list of all reviews
-// app.get("/reviews", async (req, res) => {
-//   const reviews = await prisma.reviewItem.findMany();
-//   res.status(200).json(reviews);
-// });
-
-// // GET: get review by id
-// app.get("/reviews/:id", async (req, res) => {
-//   if (!req.params.id) {
-//     res.status(401).send("Review ID does not exist");
-//   }
-//   const reviewID = Number(req.params.id);
-//   const review = await prisma.reviewItem.findUnique({
-//     where: {
-//       id: reviewID,
-//     },
-//   });
-
-//   if (review) {
-//     res.status(200).json(review);
-//   } else {
-//     res.status(404).json(`Review id ${req.params.id} does not exist`);
-//   }
-// });
-
-// // PUT: update an existing review
-// app.put("/reviews/:id", async (req, res) => {
-//   if (!req.params.id || !req.body.reviewTitle || !req.body.reviewText) {
-//     res.status(401).send("Incorrect input values");
-//   }
-
-//   const reviewID = Number(req.params.id);
-//   const { reviewTitle, reviewText } = req.body;
-//   try {
-//     const updatedReviewItem = await prisma.reviewItem.update({
-//       where: {
-//         id: reviewID,
-//       },
-//       data: {
-//         reviewTitle: `UPDATE: ${reviewTitle}`,
-//         reviewText: reviewText,
-//       },
-//     });
-//   } catch (e) {
-//     return res.status(404).send();
-//   }
-
-//   res.status(200).send();
-// });
-
-// // DELETE: delete an existing review
-// app.delete("/reviews/:id", async (req, res) => {
-//   if (!req.params.id) {
-//     res.status(401).send("Incorrect input values");
-//   }
-
-//   const reviewID = Number(req.params.id);
-//   try {
-//     const deletedReview = await prisma.reviewItem.delete({
-//       where: {
-//         id: reviewID,
-//       },
-//     });
-//   } catch (e) {
-//     return res.status(404).send();
-//   }
-
-//   res.status(200).send();
-// });

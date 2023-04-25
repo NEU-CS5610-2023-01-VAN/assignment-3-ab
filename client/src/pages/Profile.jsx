@@ -13,10 +13,6 @@ import { trackPromise } from "react-promise-tracker";
 import { useAuthToken } from "../AuthTokenContext";
 import api from "../api/base";
 
-// const mytabs = [
-//   { name: "Questions Asked", current: true },
-//   { name: "Questions Answered", current: false },
-// ];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -66,17 +62,6 @@ export default function Profile() {
           }),
         ]);
 
-        console.log("first response is ", firstResponse.data);
-        console.log(
-          "first response test ",
-          Object.keys(firstResponse.data).length
-        );
-        console.log("second response is ", secondResponse.data);
-        console.log(
-          "second response test ",
-          Object.keys(secondResponse.data).length
-        );
-
         setUserQuestionsAsked(firstResponse.data);
         setTabItems(firstResponse.data);
         setUserQuestionsAnswered(secondResponse.data);
@@ -116,12 +101,10 @@ export default function Profile() {
         ? userQuestionsAsked
         : userQuestionsAnswered
     );
-    console.log("switched tabs");
   }
 
   useEffect(() => {
     async function switchTabs() {
-      console.log("render..");
       try {
         if (Object.keys(tabItems).length > 1) {
           setArticlesShown(
@@ -145,20 +128,6 @@ export default function Profile() {
   }, [tabItems]);
 
   const { user, isAuthenticated } = useAuth0();
-
-  console.log(user);
-
-  // let items;
-  // if (Object.keys(tabItems).length > 1) {
-  //   items = tabItems.map((post) => (
-  //     <Article key={post.id} post={post} specific={true} />
-  //   ));
-  // } else if (Object.keys(tabItems).length === 1) {
-  //   items = <Article key={tabItems[0].id} post={tabItems[0]} specific={true} />;
-  // } else {
-  //   items = {};
-  // }
-  // console.log("items currently is: ", items);
 
   return (
     userQuestionsAsked &&

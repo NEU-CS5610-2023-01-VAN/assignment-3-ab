@@ -115,6 +115,8 @@ export default function ProfileSettings() {
                     </div>
                   </div>
 
+                  {/* A section to add later */}
+
                   {/* <div className="sm:col-span-4">
                     <label
                       htmlFor="username"
@@ -155,6 +157,8 @@ export default function ProfileSettings() {
                       Write a few sentences about yourself.
                     </p>
                   </div>
+
+                  {/* A feature to add later */}
 
                   {/* <div className="col-span-full">
                     <label

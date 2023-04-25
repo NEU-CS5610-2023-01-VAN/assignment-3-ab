@@ -13,10 +13,7 @@ import api from "../api/base";
 import { Routes, Route, useParams, useNavigate } from "react-router-dom";
 
 export default function Article({ post, specific }) {
-  console.log("post in article", post);
   const { user, isAuthenticated } = useAuth0();
-  console.log("user in article ", user);
-  console.log("user is :", user);
   const { accessToken } = useAuthToken();
   const navigate = useNavigate();
 
@@ -101,7 +98,7 @@ export default function Article({ post, specific }) {
             </p>
           </div>
         </div>
-        {post.author.auth0Id === user.sub && (
+        {isAuthenticated && post.author.auth0Id === user.sub && (
           <div
             className="relative mt-12 flex items-center ml-auto cursor-pointer"
             onClick={() => handleDelete(post.id)}

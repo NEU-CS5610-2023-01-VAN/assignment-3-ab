@@ -11,10 +11,7 @@ import logoOnly from "../assets/logoOnly.png";
 import Article from "./Article";
 
 export default function UserSpecificFeed({ userPosts }) {
-  const post = userPosts[0]
-  console.log(userPosts)
-
-  console.log("userPosts in USF", userPosts);
+  const post = userPosts[0];
   return (
     <div className=" mb-32">
       <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">

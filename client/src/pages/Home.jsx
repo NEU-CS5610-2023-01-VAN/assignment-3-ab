@@ -19,14 +19,6 @@ function Home() {
   const { promiseInProgress } = usePromiseTracker();
   const { user, isAuthenticated } = useAuth0();
 
-  // const testProfile = () => {
-  //   return (
-  //     isAuthenticated && (
-  //       <article className=" text-2xl">{JSON.stringify(user)}</article>
-  //     )
-  //   );
-  // };
-
   const [userQuestions, setUserQuestions] = useState(null);
   const { accessToken } = useAuthToken();
 
@@ -37,7 +29,6 @@ function Home() {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setUserQuestions(response.data);
-        console.log("response dot data ", response.data)
       } catch (err) {
         console.log(err);
       }
@@ -51,20 +42,27 @@ function Home() {
   const [questions, setQuestions] = useQuestions();
 
   return (
-    <>   
-      {userQuestions && (
+    <>
+      {(isAuthenticated && userQuestions && (
         <>
           <Banner />
-          {/* <article className=" text-2xl">{JSON.stringify(user)}</article> */}
-          {/* <Banner />
-          <article className=" text-2xl">{JSON.stringify(userQuestions)}</article> */}
           <Feed
             posts={questions}
             setUserPosts={setUserQuestions}
             userPosts={userQuestions}
-          />   
+          />
         </>
-      )}
+      )) ||
+        (!isAuthenticated && (
+          <>
+            <Banner />
+            <Feed
+              posts={questions}
+              setUserPosts={setUserQuestions}
+              userPosts={userQuestions}
+            />
+          </>
+        ))}
     </>
   );
 }

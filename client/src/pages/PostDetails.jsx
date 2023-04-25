@@ -28,51 +28,6 @@ import { useAuthToken } from "../AuthTokenContext";
 import api from "../api/base";
 import { Routes, Route, useParams } from "react-router-dom";
 
-const comments = [
-  {
-    id: 4,
-    type: "commented",
-    person: {
-      id: 1,
-      name: "Chelsea Hagon",
-      imageUrl:
-        "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    comment:
-      "Called client, they reassured me the invoice would be paid by the 25th.Called client, they reassured me the invoice would be paid by the 25th.Called client, they reassured me the invoice would be paid by the 25th.Called client, they reassured me the invoice would be paid by the 25th.Called client, they reassured me the invoice would be paid by the 25th.",
-    date: "3d ago",
-    dateTime: "2023-01-23T15:56",
-  },
-  {
-    id: 5,
-    type: "commented",
-    person: {
-      id: 2,
-      name: "Zia Urahim",
-      imageUrl:
-        "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    comment:
-      "Called client, they reassured me the invoice would be paid by the 25th.",
-    date: "3d ago",
-    dateTime: "2023-01-23T15:56",
-  },
-  {
-    id: 6,
-    type: "commented",
-    person: {
-      id: 3,
-      name: "Marouane Samir",
-      imageUrl:
-        "https://images.unsplash.com/photo-1550525811-e5869dd03032?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-    comment:
-      "Called client, they reassured me the invoice would be paid by the 25th.",
-    date: "3d ago",
-    dateTime: "2023-01-23T15:56",
-  },
-];
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -82,7 +37,6 @@ export default function PostDetails() {
 
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth0();
-  // console.log("user is :", user)
   const { accessToken } = useAuthToken();
 
   const [postDetails, setPostDetails] = useState(null);
@@ -95,26 +49,20 @@ export default function PostDetails() {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setPostDetails(response.data);
-        console.log(response.data);
         setPostComments(response.data.answers);
-        console.log(response.data.answers);
       } catch (err) {
         console.log(err);
       }
     }
-    if (accessToken) {
-      fetchPostInfo();
-    }
+
+    fetchPostInfo();
   }, [accessToken, postId, postComments.length]);
 
   const [comment, setComment] = useState("");
 
-  console.log("Post comments after rerender is: ", postComments);
-
   async function handleCommentSubmit(e) {
     e.preventDefault();
     let newComment = { content: comment, questionID: postId };
-    console.log(newComment);
     try {
       const response = await api.post("/answer", newComment, {
         headers: { Authorization: `Bearer ${accessToken}` },
@@ -150,28 +98,6 @@ export default function PostDetails() {
     return fixedTime;
   }
 
-  const post = {
-    id: 2,
-    title: "Boost your conversion rate",
-    href: "#",
-    description:
-      "Illo sint voluptas. Error voluptates culpa eligendi. Hic vel totam vitae illo. Non aliquid explicabo necessitatibus unde. Sed exercitationem placeat consectetur nulla deserunt vel iusto corrupti dicta laboris incididunt.",
-    createdAt: "2023-04-20T00:00:48.652Z",
-    datetime: "2020-03-16",
-    tag: { name: "C++", href: "#" },
-    author: {
-      name: "Zia",
-      role: "Co-Founder / CTO",
-      href: "#",
-      imageUrl:
-        "https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
-    },
-  };
-
-  // const { isAuthenticated } = useAuth0();
-
-  console.log("post comments is ", postComments);
-
   return (
     postDetails && (
       <div className="bg-white py-10 sm:py-10">
@@ -189,7 +115,7 @@ export default function PostDetails() {
                       key={commentItem.id}
                       commentItem={commentItem}
                       commentItemIdx={commentItemIdx}
-                      commentsListLength={comments.length}
+                      commentsListLength={postComments.length}
                       formatTime={formatTime}
                       postComments={postComments}
                       setPostComments={setPostComments}

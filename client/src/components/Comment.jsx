@@ -37,7 +37,6 @@ export default function Comment({
   postComments,
   setPostComments,
 }) {
-  console.log("comment item is", commentItem);
   const { accessToken } = useAuthToken();
   const navigate = useNavigate();
 
@@ -47,8 +46,7 @@ export default function Comment({
         headers: { Authorization: `Bearer ${accessToken}` },
       });
 
-      const newCommentsList = postComments.filter((post) => post.id != id);
-      console.log("new comments List is : ", newCommentsList);
+      const newCommentsList = postComments.filter((post) => post.id !== id);
       setPostComments(newCommentsList);
       navigate(`/posts/${commentItem.questionID}`);
     } catch (err) {
