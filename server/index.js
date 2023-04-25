@@ -239,10 +239,19 @@ app.get("/answers", requireAuth, async (req, res) => {
     where: {
       auth0Id,
     },
-    include: { answers: { include: { question: true } } },
   });
 
-  res.json(user.answers);
+  const userAnsweredQuestions = await prisma.question.findMany({
+    distinct: ["authorId"],
+    where: {
+      answers: {
+        every: { userId: user.id },
+      },
+    },
+    include: { tag: true, author: true, answers: true },
+  });
+
+  res.json(userAnsweredQuestions);
 });
 
 // *** PUT *** //
@@ -334,7 +343,9 @@ app.delete("/answers/:id", requireAuth, async (req, res) => {
   res.status(200).send();
 });
 
+const PORT = parseInt(process.env.PORT) || 8000;
+
 // Starts HTTP Server
-app.listen(8000, () => {
-  console.log("Server running on http://localhost:8000 🎉 🚀");
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT} 🎉 🚀`);
 });
