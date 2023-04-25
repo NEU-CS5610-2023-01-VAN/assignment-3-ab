@@ -13,7 +13,6 @@ import { trackPromise } from "react-promise-tracker";
 import { useAuthToken } from "../AuthTokenContext";
 import api from "../api/base";
 
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
@@ -27,8 +26,8 @@ export default function Profile() {
   const { accessToken } = useAuthToken();
   const [userQuestionsAnswered, setUserQuestionsAnswered] = useState(null);
   const [userQuestionsAsked, setUserQuestionsAsked] = useState(null);
-  const [tabItems, setTabItems] = useState(null);
   const [articlesShown, setArticlesShown] = useState(null);
+  const [tabItems, setTabItems] = useState(null);
 
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -63,21 +62,24 @@ export default function Profile() {
         ]);
 
         setUserQuestionsAsked(firstResponse.data);
+        console.log("first resp", firstResponse.data);
         setTabItems(firstResponse.data);
         setUserQuestionsAnswered(secondResponse.data);
-        if (Object.keys(firstResponse.data).length > 1) {
-          setArticlesShown(
-            firstResponse.data.map((post) => (
-              <Article key={post.id} post={post} specific={true} />
-            ))
-          );
-        } else if (Object.keys(firstResponse.data).length === 1) {
-          setArticlesShown(
-            <Article key={tabItems[0].id} post={tabItems[0]} specific={true} />
-          );
-        } else {
-          setArticlesShown(<div></div>);
-        }
+        console.log("second resp", secondResponse.data);
+
+        // if (Object.keys(firstResponse.data).length > 1) {
+        //   setArticlesShown(
+        //     firstResponse.data.map((post) => (
+        //       <Article key={post.id} post={post} specific={true} />
+        //     ))
+        //   );
+        // } else if (Object.keys(firstResponse.data).length === 1) {
+        //   setArticlesShown(
+        //     <Article key={tabItems[0].id} post={tabItems[0]} specific={true} />
+        //   );
+        // } else {
+        //   setArticlesShown(<div></div>);
+        // }
       } catch (err) {
         console.log(err);
       }
@@ -103,29 +105,49 @@ export default function Profile() {
     );
   }
 
-  useEffect(() => {
-    async function switchTabs() {
-      try {
-        if (Object.keys(tabItems).length > 1) {
-          setArticlesShown(
-            tabItems.map((post) => (
-              <Article key={post.id} post={post} specific={true} />
-            ))
-          );
-        } else if (Object.keys(tabItems).length === 1) {
-          setArticlesShown(
-            <Article key={tabItems[0].id} post={tabItems[0]} specific={true} />
-          );
-        } else {
-          setArticlesShown(<div></div>);
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
+  // function mappedTabItems(items) {
+  //   try {
+  //     if (Object.keys(items).length > 1) {
+  //       setArticlesShown(
+  //         items.map((post) => (
+  //           <Article key={post.id} post={post} specific={true} />
+  //         ))
+  //       );
+  //     } else if (Object.keys(tabItems).length === 1) {
+  //       setArticlesShown(
+  //         <Article key={tabItems[0].id} post={tabItems[0]} specific={true} />
+  //       );
+  //     } else {
+  //       setArticlesShown(<div></div>);
+  //     }
+  //   } catch (err) {
+  //     console.log(err);
+  //   }
+  // }
 
-    switchTabs();
-  }, [tabItems]);
+  // useEffect(() => {
+  //   async function switchTabs() {
+  //     try {
+  //       if (Object.keys(tabItems).length > 1) {
+  //         setArticlesShown(
+  //           tabItems.map((post) => (
+  //             <Article key={post.id} post={post} specific={true} />
+  //           ))
+  //         );
+  //       } else if (Object.keys(tabItems).length === 1) {
+  //         setArticlesShown(
+  //           <Article key={tabItems[0].id} post={tabItems[0]} specific={true} />
+  //         );
+  //       } else {
+  //         setArticlesShown(<div></div>);
+  //       }
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   }
+
+  //   switchTabs();
+  // }, [tabItems]);
 
   const { user, isAuthenticated } = useAuth0();
 
@@ -235,7 +257,17 @@ export default function Profile() {
               </div>
             </div>
             <div className="space-y-16 pt-10 sm:mt-1 sm:pt-10">
-              {articlesShown}
+              {tabItems && Object.keys(tabItems).length > 1
+                ? tabItems.map((tab) => (
+                    <Article key={tab.id} post={tab} specific={true} />
+                  ))
+                : Object.keys(tabItems).length === 1 && (
+                    <Article
+                      key={tabItems[0].id}
+                      post={tabItems[0]}
+                      specific={true}
+                    />
+                  )}
             </div>
           </div>
         </div>

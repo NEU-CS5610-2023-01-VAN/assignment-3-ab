@@ -13,6 +13,7 @@ import api from "../api/base";
 import { Routes, Route, useParams, useNavigate } from "react-router-dom";
 
 export default function Article({ post, specific }) {
+  console.log("post in article ", post)
   const { user, isAuthenticated } = useAuth0();
   const { accessToken } = useAuthToken();
   const navigate = useNavigate();
