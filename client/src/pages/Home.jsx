@@ -37,6 +37,7 @@ function Home() {
           headers: { Authorization: `Bearer ${accessToken}` },
         });
         setUserQuestions(response.data);
+        console.log("response dot data ", response.data)
       } catch (err) {
         console.log(err);
       }

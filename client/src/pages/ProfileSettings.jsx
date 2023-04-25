@@ -37,7 +37,6 @@ export default function ProfileSettings() {
   }, [accessToken]);
 
   async function handleEdit() {
-    console.log("we here?");
     const updatedUserInfo = { updatedEmail, updatedName: updatedUsername };
     try {
       const response = await api.put("/user", updatedUserInfo, {

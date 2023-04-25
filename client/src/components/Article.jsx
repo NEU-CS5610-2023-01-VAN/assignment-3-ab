@@ -8,11 +8,19 @@ import {
 import { NavLink } from "react-router-dom";
 import logoOnly from "../assets/logoOnly.png";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useAuthToken } from "../AuthTokenContext";
+import api from "../api/base";
+import { Routes, Route, useParams, useNavigate } from "react-router-dom";
 
 export default function Article({ post, specific }) {
-  console.log("post in article", post)
+  console.log("post in article", post);
   const { user, isAuthenticated } = useAuth0();
-  function fixTime(originalTime) {
+  console.log("user in article ", user);
+  console.log("user is :", user);
+  const { accessToken } = useAuthToken();
+  const navigate = useNavigate();
+
+  function formatTime(originalTime) {
     // remove the timezone indicators
     const strippedTime = originalTime.replace("T", " ").replace("Z", "");
 
@@ -34,6 +42,17 @@ export default function Article({ post, specific }) {
     return fixedTime;
   }
 
+  async function handleDelete(id) {
+    try {
+      await api.delete(`/questions/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+      navigate("/");
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
+  }
+
   return (
     <article
       key={post.id}
@@ -43,7 +62,7 @@ export default function Article({ post, specific }) {
     >
       <div className="flex items-center gap-x-4 text-xs">
         <time dateTime={post.createdAt} className="text-gray-500">
-          {fixTime(post.createdAt)}
+          {formatTime(post.createdAt)}
         </time>
         <p className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600">
           {post.tag.name}
@@ -72,14 +91,24 @@ export default function Article({ post, specific }) {
               </NavLink>
             </p>
             <p className="text-gray-600 flex items-center">
-              {/*post.author.role*/}1{" "}
-              {<ChatBubbleLeftRightIcon className="w-5 h-5 ml-1" />}
+              {/*post.author.role*/}
+              {post.answers.length}{" "}
+              {post.answers.length === 0 ? (
+                <QuestionMarkCircleIcon className="w-5 h-5 ml-1" />
+              ) : (
+                <ChatBubbleLeftRightIcon className="w-5 h-5 ml-1" />
+              )}
             </p>
           </div>
         </div>
-        <div className="relative mt-12 flex items-center ml-auto">
-          <p>{<ArchiveBoxXMarkIcon className="w-5 h-5 ml-auto" />}</p>
-        </div>
+        {post.author.auth0Id === user.sub && (
+          <div
+            className="relative mt-12 flex items-center ml-auto cursor-pointer"
+            onClick={() => handleDelete(post.id)}
+          >
+            <p>{<ArchiveBoxXMarkIcon className="w-5 h-5 ml-auto" />}</p>
+          </div>
+        )}
       </div>
     </article>
   );

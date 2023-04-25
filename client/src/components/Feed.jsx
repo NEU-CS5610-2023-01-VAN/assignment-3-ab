@@ -68,6 +68,7 @@ const posts = [
 ];
 
 export default function Feed({ posts, setUserPosts, userPosts }) {
+  console.log("user posts in Feed ", userPosts);
   const { isAuthenticated } = useAuth0();
   return (
     <div className="bg-white py-24 sm:py-25">
@@ -80,7 +81,7 @@ export default function Feed({ posts, setUserPosts, userPosts }) {
             />
           )}
 
-          {isAuthenticated && userPosts && (
+          {isAuthenticated && userPosts.length > 0 && (
             <UserSpecificFeed userPosts={userPosts} />
           )}
 

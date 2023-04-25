@@ -21,6 +21,9 @@ import {
 } from "@heroicons/react/20/solid";
 import { Listbox, Transition } from "@headlessui/react";
 import logoOnly from "../assets/logoOnly.png";
+import { useAuthToken } from "../AuthTokenContext";
+import api from "../api/base";
+import { useNavigate } from "react-router-dom";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -30,7 +33,29 @@ export default function Comment({
   commentItem,
   commentItemIdx,
   commentsListLength,
+  formatTime,
+  postComments,
+  setPostComments,
 }) {
+  console.log("comment item is", commentItem);
+  const { accessToken } = useAuthToken();
+  const navigate = useNavigate();
+
+  async function handleDelete(id) {
+    try {
+      await api.delete(`/answers/${id}`, {
+        headers: { Authorization: `Bearer ${accessToken}` },
+      });
+
+      const newCommentsList = postComments.filter((post) => post.id != id);
+      console.log("new comments List is : ", newCommentsList);
+      setPostComments(newCommentsList);
+      navigate(`/posts/${commentItem.questionID}`);
+    } catch (err) {
+      console.log(`Error: ${err.message}`);
+    }
+  }
+
   return (
     <li key={commentItem.id} className="relative flex gap-x-4">
       <div
@@ -50,18 +75,21 @@ export default function Comment({
         <div className="flex justify-between gap-x-4">
           <div className="py-0.5 text-xs leading-5 text-gray-800 font-bold">
             {/* <span className="font-medium text-gray-900"> */}
-            <NavLink to={"/users/1"}>{commentItem.person.name}</NavLink>
+            <NavLink to={"/users/1"}>{commentItem.author.name}</NavLink>
             {/* </span>{" "} */}
           </div>
           <time
             dateTime={commentItem.dateTime}
             className="flex-none py-0.5 text-xs leading-5 text-gray-500"
           >
-            {commentItem.date}
+            {formatTime(commentItem.createdAt)}
           </time>
         </div>
-        <p className="text-sm leading-6 text-gray-500">{commentItem.comment}</p>
-        <ArchiveBoxXMarkIcon className="w-5 h-5 ml-auto" />
+        <p className="text-sm leading-6 text-gray-500">{commentItem.content}</p>
+        <ArchiveBoxXMarkIcon
+          className="w-5 h-5 ml-auto cursor-pointer"
+          onClick={() => handleDelete(commentItem.id)}
+        />
       </div>
     </li>
   );

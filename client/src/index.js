@@ -79,17 +79,17 @@ root.render(
               <Route
                 path="profile"
                 element={
-                  // <RequireAuth>
+                  <RequireAuth>
                   <Profile />
-                  // </RequireAuth>
+                  </RequireAuth>
                 }
               />
               <Route
                 path="profile/settings"
                 element={
-                  // <RequireAuth>
+                  <RequireAuth>
                   <ProfileSettings />
-                  // </RequireAuth>
+                  </RequireAuth>
                 }
               />
               {/* <Route

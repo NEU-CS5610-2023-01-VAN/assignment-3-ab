@@ -9,19 +9,13 @@ import logo from "../assets/segFaultLogo.png";
 import { useNavigate } from "react-router-dom";
 import { useAuth0 } from "@auth0/auth0-react";
 
-const user = {
-  name: "Chelsea Hagon",
-  email: "chelsea.hagon@example.com",
-  imageUrl: userPNG,
-};
-
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const { user, isAuthenticated } = useAuth0();
+  const { user, isAuthenticated, logout } = useAuth0();
   // const isAuthenticated = false
 
   const navigation = [
@@ -32,6 +26,7 @@ export default function Navbar() {
     ? [
         { name: "My Profile", to: "/profile" },
         { name: "Edit Profile Details", to: "/profile/settings" },
+        { name: "Sign out", to: "" },
       ]
     : [{ name: "Sign In / Register", to: "/login" }];
 
@@ -113,17 +108,30 @@ export default function Navbar() {
                     <Menu.Items className="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
                       {userNavigation.map((item) => (
                         <Menu.Item key={item.name}>
-                          {({ active }) => (
-                            <NavLink
-                              to={item.to}
-                              className={classNames(
-                                active ? "bg-gray-100" : "",
-                                "block px-4 py-2 text-sm text-gray-700"
-                              )}
-                            >
-                              {item.name}
-                            </NavLink>
-                          )}
+                          {({ active }) =>
+                            item.name !== "Sign out" ? (
+                              <NavLink
+                                to={item.to}
+                                className={classNames(
+                                  active ? "bg-gray-100" : "",
+                                  "block px-4 py-2 text-sm text-gray-700"
+                                )}
+                              >
+                                {item.name}
+                              </NavLink>
+                            ) : (
+                              <button
+                                onClick={() => logout()}
+                                className={classNames(
+                                  active ? "bg-red-100 w-full block" : "",
+                                  "block px-4 py-2 text-sm text-gray-700 w-full mr-auto pr-28"
+                                )}
+                              >
+                                {" "}
+                                Sign Out{" "}
+                              </button>
+                            )
+                          }
                         </Menu.Item>
                       ))}
                     </Menu.Items>

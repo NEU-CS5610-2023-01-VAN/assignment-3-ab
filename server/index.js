@@ -162,6 +162,7 @@ app.post("/answer", requireAuth, async (req, res) => {
   const auth0Id = req.auth.payload.sub;
 
   const { content, questionID } = req.body;
+  console.log(content, questionID);
 
   if (!content || !questionID) {
     res.status(400).send("Content and questionID are required");
@@ -172,6 +173,7 @@ app.post("/answer", requireAuth, async (req, res) => {
         author: { connect: { auth0Id } },
         question: { connect: { id: parseInt(questionID) } },
       },
+      include: { author: true },
     });
 
     res.status(201).json(newAnswer);
@@ -242,7 +244,11 @@ app.get("/question/:id", async (req, res) => {
     where: {
       id: parseInt(id),
     },
-    include: { answers: true, author: true, tag: true },
+    include: {
+      answers: { include: { author: true } },
+      author: true,
+      tag: true,
+    },
   });
 
   res.status(201).json(question);
@@ -275,7 +281,7 @@ app.get("/questions/user", requireAuth, async (req, res) => {
     include: {
       questions: {
         orderBy: { createdAt: "desc" },
-        include: { answers: true, tag: true },
+        include: { answers: true, tag: true, author: true },
       },
     },
   });
