@@ -134,6 +134,26 @@ app.get("/profile", requireAuth, async (req, res) => {
   res.json(user);
 });
 
+// GET User information
+app.get("/users/:id", async (req, res) => {
+  if (!req.params.id) {
+    res.status(401).send("Incorrect input values");
+  }
+
+  console.log(req.params.id);
+
+  const userID = Number(req.params.id);
+
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userID,
+    },
+    // include: { questions: { include: { answers } } },
+  });
+
+  res.json(user);
+});
+
 // // get logged in user posts/questions of authenticated user
 // app.get("/me", requireAuth, async (req, res) => {
 //   const auth0Id = req.auth.payload.sub;

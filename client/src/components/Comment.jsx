@@ -73,7 +73,7 @@ export default function Comment({
         <div className="flex justify-between gap-x-4">
           <div className="py-0.5 text-xs leading-5 text-gray-800 font-bold">
             {/* <span className="font-medium text-gray-900"> */}
-            <NavLink to={"/users/1"}>{commentItem.author.name}</NavLink>
+            <NavLink to={`/users/${commentItem.author.id}`}>{commentItem.author.name}</NavLink>
             {/* </span>{" "} */}
           </div>
           <time

@@ -13,7 +13,6 @@ import api from "../api/base";
 import { Routes, Route, useParams, useNavigate } from "react-router-dom";
 
 export default function Article({ post, specific }) {
-  console.log("post in article ", post)
   const { user, isAuthenticated } = useAuth0();
   const { accessToken } = useAuthToken();
   const navigate = useNavigate();
@@ -82,7 +81,7 @@ export default function Article({ post, specific }) {
           <img src={logoOnly} alt="segFault icon" className="h-10 w-12 " />
           <div className="text-sm leading-6 mr-auto">
             <p className="font-semibold text-gray-900">
-              <NavLink to={"/users/1"}>
+              <NavLink to={`/users/${post.author.id}`}>
                 {/*Maybe add a href or navlink to that user's profile*/}
                 {/* <span className="absolute inset-0" /> */}
                 {specific ? user.name : post.author.name}
