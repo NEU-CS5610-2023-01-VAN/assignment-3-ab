@@ -262,10 +262,10 @@ app.get("/answers", requireAuth, async (req, res) => {
   });
 
   const userAnsweredQuestions = await prisma.question.findMany({
-    distinct: ["authorId"],
+    distinct: ["id"],
     where: {
       answers: {
-        every: { userId: user.id },
+        some: { userId: user.id },
       },
     },
     include: { tag: true, author: true, answers: true },
