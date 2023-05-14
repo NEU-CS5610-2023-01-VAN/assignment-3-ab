@@ -32,7 +32,7 @@ export default function UserDetails() {
 
   return (
     userDetails && (
-      <div className="bg-white py-15 sm:py-15 pb-20 pt-10">
+      <div className="bg-white py-15 sm:py-15 pb-20 pt-10 mt-20">
         <div className="mx-auto max-w-7xl px-6 lg:px-8 pb-10">
           <div className="mx-auto max-w-2xl">
             <div className="overflow-hidden bg-white border-8 border-gray-300 sm:rounded-lg">

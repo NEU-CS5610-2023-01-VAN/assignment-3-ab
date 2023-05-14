@@ -33,7 +33,7 @@ export default function Navbar() {
   return (
     <Disclosure
       as="header"
-      className="bg-gray-800 position: relative top-0 w-full z-50"
+      className="bg-gray-800 position: fixed top-0 w-full z-50 mb-30"
     >
       {({ open }) => (
         <>
